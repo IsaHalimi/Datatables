@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.0.0/css/buttons.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.0/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.colVis.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.0.0/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/colreorder/1.5.4/js/dataTables.colReorder.min.js"></script>
+  
+</head>
+    <style>
+    .ca{text-align: center;}
+    td.green {color:green;}
+    .odd { background-color: #e8e8e8 !important; }
+    #zitate_wrapper {
+        height: 90vh;
+        overflow: auto;}
+    #das_zitat {
+        position: fixed; 
+        bottom: 0; 
+        left: 0; 
+        width: 100%; 
+        height: 10vh;
+        background-color: black;
+        color: white;
+        padding: 10px;
+        font-size: 20px;
+        box-sizing: border-box; 
+        z-index: 100; 
+        padding: 10px;
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        text-align: center;
+}
+</style>
+<body>
+    <table id="zitate" class="display" style="width:100%">
+        <thead>
+            <tr>
+                <th>Palindrome</th>
+                <th>Sprache</th>
+                <th>Zitat</th>
+                <th>Wortzahl</th>
+            </tr>
+        </thead>
+    </table>
+
+    <section id="das_zitat">
+        
+    </section>
+
+    <script>
+        $(document).ready( function () {
+            let table = $('#zitate').DataTable({
+                ajax: {
+                    url: "https://www.mindpower.ch/index.cfm/quotes/dt",
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'quote', title: 'Quote', className: 'noVis' },
+                    { data: 'palindrome', className: 'ca green', title: 'Palindrome',
+                    render: function ( data, type, row ) {
+                        if (type === 'display') {
+                            return data === true || data === 'true' ? '✔' : '';
+                        } else if (type === 'filter') {
+                            return (data === true || data === 'true' ? '✔' : '') + ' ' + data;
+                        }
+                        return data;
+                    },
+                },    
+                    { data: 'lang', className: 'ca', title: 'Language' },
+                    {
+                    data: 'quote',
+                    title: 'Wortzahl',
+                    className: 'ca',
+                    render: function ( data, type, row ) {
+                            // Split by spaces and count the words
+                            return data.split(/\s+/).length;
+                        },
+                    orderable: true, // Make sure the column is sortable
+                },
+                ],
+                lengthMenu: [ [10, 20, 50, 100], [10, 20, 50, 100] ],
+                dom: '<"top"l>Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', { extend: 'print', text: 'Drucken' },
+                    { extend: 'colvis', text: 'Spalten ein/aus' }
+                ],
+                autowidth: false,
+                colReorder: true,
+                stateSave: true
+            });
+
+            $('#zitate tbody').on('click', 'tr', function () {
+                var data = table.row(this).data();
+                var quote = data.quote;
+                $('#das_zitat').text(quote);
+            });
+            
+        });
+    </script>
+</body>
+</html>
